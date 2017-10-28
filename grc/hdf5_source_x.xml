@@ -3,7 +3,7 @@
   <name>HDF5 Source</name>
   <key>hdf5_source_x</key>
 	<category>[Thesis]/HDF5</category>
-	<import>import hdf5
+	<import>from hdf5.hdf5_sink_x import hdf5_source_$(type.fcn)
 import logging</import>
 
 	<make>hdf5.hdf5_source_$(type.fcn)(
