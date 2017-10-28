@@ -3,12 +3,13 @@
   <name>HDF5 Sink</name>
   <key>hdf5_sink_x</key>
 	<category>[Thesis]/HDF5</category>
-	<import>import hdf5
-  import logging</import>
+	<import>from hdf5.hdf5_sink_x import hdf5_sink_$(type.fcn)
+import logging</import>
 
-	<make>hdf5.hdf5_sink_$(type.fcn)(
+	<make>hdf5_sink_$(type.fcn)(
 		num_inputs=$num_inputs,
-    dataset_name=$dataset_name,
+    	dataset_name=$dataset_name,
+		shrink=$shrink,
 		data_filename=$data_filename,
 		log_level=$log_level, 
  		log_filename=$log_filename
@@ -48,11 +49,26 @@
 		<type>int</type>
 	</param>
 
-  <param>
+  	<param>
 		<name>Dataset Name</name>
 		<key>dataset_name</key>
 		<value>'dataset'</value>
 		<type>string</type>
+	</param>
+
+  	<param>
+		<name>Xero existing dataset?</name>
+		<key>shrink</key>
+		<value>True</value>
+		<type>bool</type>
+		<option>
+			<name>True</name>
+			<key>True</key>
+		</option>
+		<option>
+			<name>False</name>
+			<key>False</key>
+		</option>
 	</param>
 
 	<param>

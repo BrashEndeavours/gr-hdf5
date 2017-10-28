@@ -32,8 +32,9 @@ class _hdf5_sink_x(gr.sync_block):
     def __init__(self,
                  num_inputs,
                  dataset_name,
+                 shrink,
                  data_filename,
-		         log_level, 
+                 log_level, 
  		         log_filename,
                  name,
                  dtype):
@@ -43,7 +44,7 @@ class _hdf5_sink_x(gr.sync_block):
         self.log_level = log_level
         self.log_filename = log_filename
         self.name = name
-        self.dtype=dtype
+        self.dtype = dtype
         
         gr.sync_block.__init__(self,
                                self.name,
@@ -74,7 +75,7 @@ class _hdf5_sink_x(gr.sync_block):
         self.array = np.array(object=[],
                               dtype=self.dtype).reshape(0, self.num_inputs)
 
-        self.init_file_export()
+        self.init_file_export(shrink)
 
         self.logger.info("HDF5 Sink initialized, filename: {}".format(self.data_filename))
 
@@ -93,23 +94,32 @@ class _hdf5_sink_x(gr.sync_block):
 
         return min_stream_length
 
-    def init_file_export(self):
-        try:
-            os.remove(self.data_filename)
-        except Exception:
-            pass
+    def init_file_export(self, shrink):
+        #try:
+        #    os.remove(self.data_filename)
+        #except Exception:
+        #    pass
         if self.data_filename == "":
             self.logger.error("Filename empty")
         else:
-            self.datafile = h5py.File(self.data_filename, "w")
-            self.dataset = self.datafile.create_dataset(self.dataset_name,
-                                                        shape=(0, self.num_inputs),
-                                                        maxshape=(None, self.num_inputs),
-                                                        dtype=self.dtype,
-                                                        data=self.array)
+            self.datafile = h5py.File(self.data_filename, "a")
+            try:
+                self.dataset = self.datafile.get(self.dataset_name)
+                if shrink:
+                    self.dataset.resize((0,self.num_inputs))
+            except Exception:
+                self.dataset = self.datafile.require_dataset(self.dataset_name,
+                                                            shape=(0, self.num_inputs),
+                                                            maxshape=(None, self.num_inputs),
+                                                            dtype=self.dtype,
+                                                            data=self.array)
+            self.datafile.close()
         return
 
     def process_file_export(self, min_stream_length, array):
+        self.datafile = h5py.File(self.data_filename, "a")
+        self.dataset = self.datafile.get(self.dataset_name)
+        
         self.disk_array_len = self.dataset.shape[0]
         self.logger.debug("HDF5 Shape Before: {}".format(self.dataset.shape))
         self.logger.debug("Number of Samples to add {}".format(min_stream_length))
@@ -120,6 +130,8 @@ class _hdf5_sink_x(gr.sync_block):
         self.datafile.flush()
 
         self.logger.debug("HDF5 Shape After: {}".format(self.dataset.shape))
+
+        self.datafile.close()
         return
 
     def close_file_export(self):
@@ -147,9 +159,10 @@ class hdf5_sink_b(_hdf5_sink_x):
     """
     docstring for block hdf5_sink_b
     """
-    def __init__(self, num_inputs, dataset_name, data_filename, log_level, log_filename):
+    def __init__(self, num_inputs, dataset_name, shrink, data_filename, log_level, log_filename):
         super(hdf5_sink_b, self).__init__(num_inputs, 
-                                          dataset_name, 
+                                          dataset_name,
+                                          shrink, 
                                           data_filename, 
                                           log_level, 
                                           log_filename,
@@ -160,9 +173,10 @@ class hdf5_sink_s(_hdf5_sink_x):
     """
     docstring for block hdf5_sink_s
     """
-    def __init__(self, num_inputs, dataset_name, data_filename, log_level, log_filename):
+    def __init__(self, num_inputs, dataset_name, shrink, data_filename, log_level, log_filename):
         super(hdf5_sink_s, self).__init__(num_inputs, 
                                           dataset_name, 
+                                          shrink,
                                           data_filename, 
                                           log_level, 
                                           log_filename,
@@ -173,9 +187,10 @@ class hdf5_sink_i(_hdf5_sink_x):
     """
     docstring for block hdf5_sink_i
     """
-    def __init__(self, num_inputs, dataset_name, data_filename, log_level, log_filename):
+    def __init__(self, num_inputs, dataset_name, shrink, data_filename, log_level, log_filename):
         super(hdf5_sink_i, self).__init__(num_inputs, 
                                           dataset_name, 
+                                          shrink,
                                           data_filename, 
                                           log_level, 
                                           log_filename,
@@ -185,9 +200,10 @@ class hdf5_sink_f(_hdf5_sink_x):
     """
     docstring for block hdf5_sink_f
     """
-    def __init__(self, num_inputs, dataset_name, data_filename, log_level, log_filename):
+    def __init__(self, num_inputs, dataset_name, shrink, data_filename, log_level, log_filename):
         super(hdf5_sink_f, self).__init__(num_inputs, 
                                           dataset_name, 
+                                          shrink,
                                           data_filename, 
                                           log_level, 
                                           log_filename,

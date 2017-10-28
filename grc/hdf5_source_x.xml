@@ -4,15 +4,15 @@
   <key>hdf5_source_x</key>
 	<category>[Thesis]/HDF5</category>
 	<import>import hdf5
-  import logging</import>
+import logging</import>
 
 	<make>hdf5.hdf5_source_$(type.fcn)(
-    num_outputs=$num_outputs,
-    dataset_name=$dataset_name,
-    data_filename=$data_filename,
-    log_level=$log_level, 
-    log_filename=$log_filename
-  )</make>
+		num_outputs=$num_outputs,
+		dataset_name=$dataset_name,
+		data_filename=$data_filename,
+		log_level=$log_level, 
+		log_filename=$log_filename
+	)</make>
 
 		
 	<param>
