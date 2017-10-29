@@ -102,17 +102,24 @@ class _hdf5_sink_x(gr.sync_block):
         if self.data_filename == "":
             self.logger.error("Filename empty")
         else:
-            self.datafile = h5py.File(self.data_filename, "a")
-            try:
+            if os.path.isfile(self.data_filename):
+                self.datafile = h5py.File(self.data_filename, "a")
                 self.dataset = self.datafile.get(self.dataset_name)
+                if self.dataset == None:
+                    self.dataset = self.datafile.create_dataset(self.dataset_name,
+                                                             shape=(0, self.num_inputs),
+                                                             maxshape=(None, self.num_inputs),
+                                                             dtype=self.dtype,
+                                                             data=self.array)
                 if shrink:
                     self.dataset.resize((0,self.num_inputs))
-            except Exception:
-                self.dataset = self.datafile.require_dataset(self.dataset_name,
-                                                            shape=(0, self.num_inputs),
-                                                            maxshape=(None, self.num_inputs),
-                                                            dtype=self.dtype,
-                                                            data=self.array)
+            else:
+                self.datafile = h5py.File(self.data_filename, "a")
+                self.dataset = self.datafile.create_dataset(self.dataset_name,
+                                                             shape=(0, self.num_inputs),
+                                                             maxshape=(None, self.num_inputs),
+                                                             dtype=self.dtype,
+                                                             data=self.array)
             self.datafile.close()
         return
 
@@ -120,7 +127,10 @@ class _hdf5_sink_x(gr.sync_block):
         self.datafile = h5py.File(self.data_filename, "a")
         self.dataset = self.datafile.get(self.dataset_name)
         
-        self.disk_array_len = self.dataset.shape[0]
+        if self.dataset == None:
+            self.disk_array_len = 0
+        else:
+            self.disk_array_len = self.dataset.shape[0]
         self.logger.debug("HDF5 Shape Before: {}".format(self.dataset.shape))
         self.logger.debug("Number of Samples to add {}".format(min_stream_length))
         
