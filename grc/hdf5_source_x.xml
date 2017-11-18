@@ -110,6 +110,6 @@ import logging</import>
 	<source>
 		<name>out</name>
 		<type>$type</type>
-		<nports>$num_inputs</nports>
+		<nports>$num_outputs</nports>
 	</source>
 </block>
