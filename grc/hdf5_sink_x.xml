@@ -15,6 +15,8 @@ import logging</import>
  		log_filename=$log_filename
 	)</make>
 
+	<callback>set_dataset_name($dataset_name)</callback>
+	<callback>set_data_filename($data_filename)</callback>
 		
 	<param>
 		<name>IO Type</name>
