@@ -105,7 +105,7 @@ class _hdf5_sink_x(gr.sync_block):
             if os.path.isfile(self.data_filename):
                 self.datafile = h5py.File(self.data_filename, "a")
                 self.dataset = self.datafile.get(self.dataset_name)
-                if self.dataset == None:
+                if self.dataset is None:
                     self.dataset = self.datafile.create_dataset(self.dataset_name,
                                                              shape=(0, self.num_inputs),
                                                              maxshape=(None, self.num_inputs),
@@ -127,10 +127,11 @@ class _hdf5_sink_x(gr.sync_block):
         self.datafile = h5py.File(self.data_filename, "a")
         self.dataset = self.datafile.get(self.dataset_name)
         
-        if self.dataset == None:
+        if self.dataset is None:
             self.disk_array_len = 0
         else:
             self.disk_array_len = self.dataset.shape[0]
+            
         self.logger.debug("HDF5 Shape Before: {}".format(self.dataset.shape))
         self.logger.debug("Number of Samples to add {}".format(min_stream_length))
         
@@ -152,6 +153,7 @@ class _hdf5_sink_x(gr.sync_block):
 
     def set_dataset_name(self, dataset_name):
         self.dataset_name = dataset_name
+        self.init_file_export(False)
         return
 
     def get_dataset_name(self):
@@ -159,6 +161,7 @@ class _hdf5_sink_x(gr.sync_block):
    
     def set_data_filename(self, data_filename):
         self.data_filename = data_filename
+        self.init_file_export(False)
         return
 
     def get_data_filename(self):
